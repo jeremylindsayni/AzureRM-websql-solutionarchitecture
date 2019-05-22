@@ -125,11 +125,11 @@
           ]
         },
         "name": "[variables('name')]",
-        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier'))))]",
+        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm'))]",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier'))))]",
+        "[concat('Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm'))]",
         "microsoft.insights/components/mywebsiteapplication"
       ],
       "apiVersion": "2016-03-01",
