@@ -87,7 +87,7 @@
           "connectionStrings": [
             {
               "name": "defaultConnection",
-              "ConnectionString": "[concat('Data Source=tcp:' , reference('Microsoft.SQL/servers/mywebsitedatabase').fullyQualifiedDomainName , ',1433;Initial Catalog=mywebsitedatabase;User Id=', parameters('administratorLogin'),'@',reference('Microsoft.SQL/servers/mywebsitedatabase').fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'))).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat('Microsoft.SQL/servers/',parameters('databaseName'))),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'))).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
               "type": "SQLAzure"
             }
           ],
