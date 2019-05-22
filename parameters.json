@@ -8,12 +8,6 @@
     "administratorLoginPassword": {
       "value": null
     },
-    "databaseUsername": {
-      "value": "jeremy"
-    },
-    "databasePassword": {
-      "value": null
-    },
     "serverFarmResourceGroup": {
       "value": "development-rg"
     },
