@@ -6,9 +6,6 @@
     "administratorLoginPassword": {
       "type": "securestring"
     },
-    "hostingPlanName": {
-      "type": "string"
-    },
     "skuTier": {
       "type": "string",
       "defaultValue": "Free",
@@ -19,7 +16,7 @@
         "Standard"
       ],
       "metadata": {
-        "description": "Choose what tier of SQL environment"
+        "description": "Choose what tier of farm environment"
       }
     },
     "skuCode": {
@@ -36,17 +33,20 @@
         "S3"
       ],
       "metadata": {
-        "description": "Choose what tier of SQL environment"
+        "description": "Choose what tier of farm environment"
       }
     },
     "edition": {
-      "type": "string"
-    },
-    "databaseName": {
-      "type": "string"
-    },
-    "serverName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "Choose what tier of SQL environment"
+      }
     }
   },
   "variables": {
@@ -58,7 +58,10 @@
     "hostingEnvironment": "",
     "location": "UK South",
     "workerSize": "0",
-    "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e"
+    "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e",
+	"databaseName":"[concat('application-', uniqueString(resourceGroup().id))]",
+	"serverName":"[concat('application-', uniqueString(resourceGroup().id))]",
+	"hostingPlanName":"[concat('application-', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
@@ -69,7 +72,7 @@
           "connectionStrings": [
             {
               "name": "defaultConnection",
-              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL\/servers\/',parameters('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',concat(parameters('databaseName'), '-db'),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL\/servers\/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL\/servers\/',variables('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',concat(variables('databaseName'), '-db'),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL\/servers\/',variables('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
               "type": "SQLAzure"
             }
           ],
@@ -113,11 +116,11 @@
           ]
         },
         "name": "[variables('name')]",
-        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm'))]",
+        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm'))]",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm'))]",
+        "[concat('Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm'))]",
         "microsoft.insights/components/mywebsiteapplication"
       ],
       "apiVersion": "2016-03-01",
@@ -125,11 +128,11 @@
     },
     {
       "apiVersion": "2016-09-01",
-      "name": "[concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm')]",
+      "name": "[concat(toLower(variables('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[variables('location')]",
       "properties": {
-        "name": "[concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm')]",
+        "name": "[concat(toLower(variables('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm')]",
         "workerSizeId": "[variables('workerSize')]",
         "numberOfWorkers": "1",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
@@ -150,7 +153,7 @@
       }
     },
     {
-      "name": "[concat(toLower(parameters('serverName')), '-server')]",
+      "name": "[concat(toLower(variables('serverName')), '-server')]",
       "type": "Microsoft.Sql/servers",
       "location": "[variables('serverLocation')]",
       "apiVersion": "2014-04-01-preview",
@@ -161,12 +164,12 @@
       },
       "resources": [
         {
-          "name": "[concat(toLower(parameters('databaseName')), '-db')]",
+          "name": "[concat(toLower(variables('databaseName')), '-db')]",
           "type": "databases",
           "location": "[variables('serverLocation')]",
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-server'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(variables('serverName')), '-server'))]"
           ],
           "properties": {
             "edition": "[parameters('edition')]",
@@ -178,7 +181,7 @@
         {
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-server'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(variables('serverName')), '-server'))]"
           ],
           "location": "[variables('serverLocation')]",
           "name": "AllowAllWindowsAzureIps",
