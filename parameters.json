@@ -8,9 +8,6 @@
     "administratorLoginPassword": {
       "value": null
     },
-    "hostingPlanName": {
-      "value": "development-plan"
-    },
     "skuTier": {
       "value": "Free"
     },
@@ -19,12 +16,6 @@
     },
     "edition": {
       "value": "Basic"
-    },
-    "databaseName": {
-      "value": "mywebsitedatabase"
-    },
-    "serverName": {
-      "value": "mywebsitedatabase"
     }
   }
 }
