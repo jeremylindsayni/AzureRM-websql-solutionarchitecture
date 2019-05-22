@@ -1,0 +1,214 @@
+{
+  "parameters": {
+    "administratorLogin": {
+      "type": "string"
+    },
+    "administratorLoginPassword": {
+      "type": "securestring"
+    },
+    "databaseUsername": {
+      "type": "string"
+    },
+    "databasePassword": {
+      "type": "securestring"
+    },
+    "serverFarmResourceGroup": {
+      "type": "string",
+      "defaultValue": "development-rg",
+      "allowedValues": [
+        "development-rg",
+        "demonstration-rg",
+        "qualityassurance-rg"
+      ],
+      "metadata": {
+        "description": "Choose the resource group"
+      }
+    },
+    "hostingPlanName": {
+      "type": "string"
+    },
+    "skuTier": {
+      "type": "string",
+      "defaultValue": "Free",
+      "allowedValues": [
+        "Free",
+        "Shared",
+        "Basic",
+        "Standard"
+      ],
+      "metadata": {
+        "description": "Choose what tier of SQL environment"
+      }
+    },
+    "skuCode": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "metadata": {
+        "description": "Choose what tier of SQL environment"
+      }
+    },
+    "edition": {
+      "type": "string"
+    },
+    "databaseName": {
+      "type": "string"
+    },
+    "serverName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "collation": "SQL_Latin1_General_CP1_CI_AS",
+    "maxSizeBytes": "2147483648",
+    "requestedServiceObjectiveId": "dd6d99bb-f193-4ec1-86f2-43d3bccbc49c",
+    "serverLocation": "uksouth",
+    "name": "mywebsiteapplication-web",
+    "hostingEnvironment": "",
+    "location": "UK South",
+    "workerSize": "0",
+    "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e"
+  },
+  "resources": [
+    {
+      "name": "[variables('name')]",
+      "type": "Microsoft.Web/sites",
+      "properties": {
+        "siteConfig": {
+          "connectionStrings": [
+            {
+              "name": "defaultConnection",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference('Microsoft.SQL/servers/mywebsitedatabase').fullyQualifiedDomainName , ',1433;Initial Catalog=mywebsitedatabase;User Id=', parameters('administratorLogin'),'@',reference('Microsoft.SQL/servers/mywebsitedatabase').fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "type": "SQLAzure"
+            }
+          ],
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference('microsoft.insights/components/mywebsiteapplication', '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_Mode",
+              "value": "recommended"
+            },
+            {
+              "name": "DiagnosticServices_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+              "value": "disabled"
+            },
+            {
+              "name": "InstrumentationEngine_EXTENSION_VERSION",
+              "value": "~1"
+            },
+            {
+              "name": "SnapshotDebugger_EXTENSION_VERSION",
+              "value": "disabled"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+              "value": "~1"
+            }
+          ]
+        },
+        "name": "[variables('name')]",
+        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier'))))]",
+        "hostingEnvironment": "[variables('hostingEnvironment')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier'))))]",
+        "microsoft.insights/components/mywebsiteapplication"
+      ],
+      "apiVersion": "2016-03-01",
+      "location": "[variables('location')]"
+    },
+    {
+      "apiVersion": "2016-09-01",
+      "name": "[concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier')))]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[variables('location')]",
+      "properties": {
+        "name": "[concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier')))]",
+        "workerSizeId": "[variables('workerSize')]",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": "[variables('hostingEnvironment')]"
+      },
+      "sku": {
+        "Tier": "[parameters('skuTier')]",
+        "Name": "[parameters('skuCode')]"
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "mywebsiteapplication",
+      "type": "microsoft.insights/components",
+      "location": "uksouth",
+      "properties": {
+        "ApplicationId": "[variables('name')]",
+        "Request_Source": "IbizaWebAppExtensionCreate"
+      }
+    },
+    {
+      "name": "[concat(toLower(parameters('serverName')), '-db')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[variables('serverLocation')]",
+      "apiVersion": "2014-04-01-preview",
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "[parameters('databaseName')]",
+          "type": "databases",
+          "location": "[variables('serverLocation')]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-db'))]"
+          ],
+          "properties": {
+            "edition": "[parameters('edition')]",
+            "collation": "[variables('collation')]",
+            "maxSizeBytes": "[variables('maxSizeBytes')]",
+            "requestedServiceObjectiveId": "[variables('requestedServiceObjectiveId')]"
+          }
+        },
+        {
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-db'))]"
+          ],
+          "location": "[variables('serverLocation')]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          },
+          "type": "firewallrules"
+        }
+      ]
+    }
+  ],
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0"
+}

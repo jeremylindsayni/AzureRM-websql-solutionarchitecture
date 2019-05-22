@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "administratorLogin": {
+      "value": "jeremy"
+    },
+    "administratorLoginPassword": {
+      "value": null
+    },
+    "databaseUsername": {
+      "value": "jeremy"
+    },
+    "databasePassword": {
+      "value": null
+    },
+    "serverFarmResourceGroup": {
+      "value": "development-rg"
+    },
+    "hostingPlanName": {
+      "value": "development-plan"
+    },
+    "skuTier": {
+      "value": "Free"
+    },
+    "skuCode": {
+      "value": "F1"
+    },
+    "edition": {
+      "value": "Basic"
+    },
+    "databaseName": {
+      "value": "mywebsitedatabase"
+    },
+    "serverName": {
+      "value": "mywebsitedatabase"
+    }
+  }
+}
