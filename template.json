@@ -87,7 +87,7 @@
           "connectionStrings": [
             {
               "name": "defaultConnection",
-              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'))).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat('Microsoft.SQL/servers/',parameters('databaseName'))),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'))).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat('Microsoft.SQL/servers/',parameters('databaseName'), '-db')),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
               "type": "SQLAzure"
             }
           ],
@@ -168,7 +168,7 @@
       }
     },
     {
-      "name": "[concat(toLower(parameters('serverName')), '-db')]",
+      "name": "[concat(toLower(parameters('serverName')), '-server')]",
       "type": "Microsoft.Sql/servers",
       "location": "[variables('serverLocation')]",
       "apiVersion": "2014-04-01-preview",
@@ -179,12 +179,12 @@
       },
       "resources": [
         {
-          "name": "[parameters('databaseName')]",
+          "name": "[concat(toLower(parameters('databaseName')), '-db')]",
           "type": "databases",
           "location": "[variables('serverLocation')]",
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-db'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-server'))]"
           ],
           "properties": {
             "edition": "[parameters('edition')]",
@@ -196,7 +196,7 @@
         {
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-db'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-server'))]"
           ],
           "location": "[variables('serverLocation')]",
           "name": "AllowAllWindowsAzureIps",
