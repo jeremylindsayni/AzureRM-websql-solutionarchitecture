@@ -6,12 +6,6 @@
     "administratorLoginPassword": {
       "type": "securestring"
     },
-    "databaseUsername": {
-      "type": "string"
-    },
-    "databasePassword": {
-      "type": "securestring"
-    },
     "serverFarmResourceGroup": {
       "type": "string",
       "defaultValue": "development-rg",
@@ -87,7 +81,7 @@
           "connectionStrings": [
             {
               "name": "defaultConnection",
-              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat(parameters('databaseName'), '-db')),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
               "type": "SQLAzure"
             }
           ],
