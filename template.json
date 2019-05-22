@@ -81,7 +81,7 @@
           "connectionStrings": [
             {
               "name": "defaultConnection",
-              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL\/servers\/',parameters('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat(parameters('databaseName'), '-db')),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL\/servers\/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL\/servers\/',parameters('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',concat(parameters('databaseName'), '-db'),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL\/servers\/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
               "type": "SQLAzure"
             }
           ],
@@ -137,11 +137,11 @@
     },
     {
       "apiVersion": "2016-09-01",
-      "name": "[concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier')))]",
+      "name": "[concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[variables('location')]",
       "properties": {
-        "name": "[concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier')))]",
+        "name": "[concat(toLower(parameters('hostingPlanName')), '-', toLower(parameters('skuTier')), '-farm')]",
         "workerSizeId": "[variables('workerSize')]",
         "numberOfWorkers": "1",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
