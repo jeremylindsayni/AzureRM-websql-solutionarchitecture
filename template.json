@@ -51,8 +51,8 @@
     "workerSize": "0",
     "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e",
     "hostingPlanName": "appservice",
-    "databaseName": "database",
-    "serverName": "sqlserver"
+    "databaseName": "database-",
+    "serverName": "sqlserver-"
 
   },
   "resources": [
