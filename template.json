@@ -146,8 +146,7 @@
           "RepoUrl":"https://github.com/jeremylindsayni/BasicMVCApplication.git",
           "branch":"master"
         }
-      }
-   ]
+      }],
 	  "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier'))))]",
         "microsoft.insights/components/mywebsiteapplication"
