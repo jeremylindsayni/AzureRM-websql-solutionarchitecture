@@ -8,18 +8,6 @@
     "administratorLoginPassword": {
       "value": null
     },
-    "databaseUsername": {
-      "value": "jeremy"
-    },
-    "databasePassword": {
-      "value": null
-    },
-    "serverFarmResourceGroup": {
-      "value": "development-rg"
-    },
-    "hostingPlanName": {
-      "value": "development-plan"
-    },
     "skuTier": {
       "value": "Free"
     },
@@ -28,12 +16,6 @@
     },
     "edition": {
       "value": "Basic"
-    },
-    "databaseName": {
-      "value": "mywebsitedatabase"
-    },
-    "serverName": {
-      "value": "mywebsitedatabase"
     }
   }
 }

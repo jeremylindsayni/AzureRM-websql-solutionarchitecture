@@ -38,12 +38,6 @@
     },
     "edition": {
       "type": "string"
-    },
-    "databaseName": {
-      "type": "string"
-    },
-    "serverName": {
-      "type": "string"
     }
   },
   "variables": {
@@ -56,18 +50,27 @@
     "location": "UK South",
     "workerSize": "0",
     "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e",
-    "hostingPlanName":  "farm"
+    "hostingPlanName": "farm",
+    "databaseName": "database",
+    "serverName": "sqlserver"
+
   },
   "resources": [
     {
+      "apiVersion": "2016-03-01",
       "name": "[variables('name')]",
       "type": "Microsoft.Web/sites",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), '-farm-', toLower(parameters('skuTier'))))]",
+        "microsoft.insights/components/mywebsiteapplication"
+      ],
       "properties": {
         "siteConfig": {
           "connectionStrings": [
             {
               "name": "defaultConnection",
-              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-sqlserver')).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-sqlserver')),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',variables('serverName'), toLower(uniqueString(resourceGroup().id)), '-sqlserver')).fullyQualifiedDomainName , ',1433;Initial Catalog=',concat(toLower(variables('databaseName')), toLower(uniqueString(resourceGroup().id)), '-db'),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',variables('serverName'), toLower(uniqueString(resourceGroup().id)), '-sqlserver')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
               "type": "SQLAzure"
             }
           ],
@@ -114,12 +117,6 @@
         "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), toLower(parameters('skuTier'))))]",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
       },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), '-farm-', toLower(parameters('skuTier'))))]",
-        "microsoft.insights/components/mywebsiteapplication"
-      ],
-      "apiVersion": "2016-03-01",
-      "location": "[variables('location')]",
       "resources": [
         {
           "apiVersion": "2015-04-01",
@@ -162,7 +159,7 @@
       }
     },
     {
-      "name": "[concat(toLower(parameters('serverName')), '-sqlserver')]",
+      "name": "[concat(toLower(variables('serverName')), toLower(uniqueString(resourceGroup().id)), '-sqlserver')]",
       "type": "Microsoft.Sql/servers",
       "location": "[variables('serverLocation')]",
       "apiVersion": "2014-04-01-preview",
@@ -173,12 +170,12 @@
       },
       "resources": [
         {
-          "name": "[concat(toLower(parameters('databaseName')), '-db')]",
+          "name": "[concat(toLower(variables('databaseName')), toLower(uniqueString(resourceGroup().id)), '-db')]",
           "type": "databases",
           "location": "[variables('serverLocation')]",
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-sqlserver'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(variables('serverName')), toLower(uniqueString(resourceGroup().id)), '-sqlserver'))]"
           ],
           "properties": {
             "edition": "[parameters('edition')]",
@@ -190,7 +187,7 @@
         {
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-sqlserver'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(variables('serverName')), toLower(uniqueString(resourceGroup().id)), '-sqlserver'))]"
           ],
           "location": "[variables('serverLocation')]",
           "name": "AllowAllWindowsAzureIps",
