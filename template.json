@@ -50,7 +50,7 @@
     "location": "UK South",
     "workerSize": "0",
     "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e",
-    "hostingPlanName": "farm",
+    "hostingPlanName": "appservice",
     "databaseName": "database",
     "serverName": "sqlserver"
 
@@ -114,7 +114,7 @@
           ]
         },
         "name": "[variables('name')]",
-        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), toLower(parameters('skuTier'))))]",
+        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), '-farm-', toLower(parameters('skuTier'))))]",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
       },
       "resources": [
