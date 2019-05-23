@@ -135,7 +135,7 @@
             "branch": "master",
             "IsManualIntegration": true
           },
-          "type": "Microsoft.Web/sites/sourcecontrols"
+          "type": "sourcecontrols"
         }
       ]
     },
