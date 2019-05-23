@@ -6,27 +6,6 @@
     "administratorLoginPassword": {
       "type": "securestring"
     },
-    "databaseUsername": {
-      "type": "string"
-    },
-    "databasePassword": {
-      "type": "securestring"
-    },
-    "serverFarmResourceGroup": {
-      "type": "string",
-      "defaultValue": "development-rg",
-      "allowedValues": [
-        "development-rg",
-        "demonstration-rg",
-        "qualityassurance-rg"
-      ],
-      "metadata": {
-        "description": "Choose the resource group"
-      }
-    },
-    "hostingPlanName": {
-      "type": "string"
-    },
     "skuTier": {
       "type": "string",
       "defaultValue": "Free",
@@ -37,7 +16,7 @@
         "Standard"
       ],
       "metadata": {
-        "description": "Choose what tier of SQL environment"
+        "description": "Choose what level of WebFarm"
       }
     },
     "skuCode": {
@@ -54,7 +33,7 @@
         "S3"
       ],
       "metadata": {
-        "description": "Choose what tier of SQL environment"
+        "description": "Choose what pricing tier of WebFarm"
       }
     },
     "edition": {
@@ -76,7 +55,8 @@
     "hostingEnvironment": "",
     "location": "UK South",
     "workerSize": "0",
-    "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e"
+    "subscriptionId": "9330c17d-62d0-458a-b76d-2f7bd6f1f44e",
+    "hostingPlanName":  "farm"
   },
   "resources": [
     {
@@ -87,7 +67,7 @@
           "connectionStrings": [
             {
               "name": "defaultConnection",
-              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
+              "ConnectionString": "[concat('Data Source=tcp:' , reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-sqlserver')).fullyQualifiedDomainName , ',1433;Initial Catalog=',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-sqlserver')),';User Id=', parameters('administratorLogin'),'@',reference(concat('Microsoft.SQL/servers/',parameters('serverName'), '-server')).fullyQualifiedDomainName,';Password=',parameters('administratorLoginPassword'),';')]",
               "type": "SQLAzure"
             }
           ],
@@ -131,36 +111,36 @@
           ]
         },
         "name": "[variables('name')]",
-        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier'))))]",
+        "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), toLower(parameters('skuTier'))))]",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
       },
-      "resources":[
-      {
-        "apiVersion":"2015-04-01",
-        "name":"web",
-        "type":"sourcecontrols",
-        "dependsOn":[
-          "[resourceId('Microsoft.Web/Sites', variables('name'))]"
-        ],
-        "properties":{
-          "RepoUrl":"https://github.com/jeremylindsayni/BasicMVCApplication.git",
-          "branch":"master"
-        }
-      }],
-	  "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier'))))]",
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', concat(toLower(variables('hostingPlanName')), '-farm-', toLower(parameters('skuTier'))))]",
         "microsoft.insights/components/mywebsiteapplication"
       ],
       "apiVersion": "2016-03-01",
+	  "resources":[
+	  {
+		"apiVersion":"2015-04-01",
+		"name":"web",
+		"type":"sourcecontrols",
+		"dependsOn":[
+		  "[resourceId('Microsoft.Web/Sites', variables('name'))]"
+		],
+		"properties":{
+		  "RepoUrl":"https://github.com/jeremylindsayni/BasicMVCApplication.git",
+		  "branch":"master"
+		}
+	  },
       "location": "[variables('location')]"
     },
     {
       "apiVersion": "2016-09-01",
-      "name": "[concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier')))]",
+      "name": "[concat(toLower(variables('hostingPlanName')), '-farm-', toLower(parameters('skuTier')))]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[variables('location')]",
       "properties": {
-        "name": "[concat(toLower(parameters('hostingPlanName')), toLower(parameters('skuTier')))]",
+        "name": "[concat(toLower(variables('hostingPlanName')), '-farm-', toLower(parameters('skuTier')))]",
         "workerSizeId": "[variables('workerSize')]",
         "numberOfWorkers": "1",
         "hostingEnvironment": "[variables('hostingEnvironment')]"
@@ -181,7 +161,7 @@
       }
     },
     {
-      "name": "[concat(toLower(parameters('serverName')), '-server')]",
+      "name": "[concat(toLower(parameters('serverName')), '-sqlserver')]",
       "type": "Microsoft.Sql/servers",
       "location": "[variables('serverLocation')]",
       "apiVersion": "2014-04-01-preview",
@@ -197,7 +177,7 @@
           "location": "[variables('serverLocation')]",
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-server'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-sqlserver'))]"
           ],
           "properties": {
             "edition": "[parameters('edition')]",
@@ -209,7 +189,7 @@
         {
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-server'))]"
+            "[concat('Microsoft.Sql/servers/', concat(toLower(parameters('serverName')), '-sqlserver'))]"
           ],
           "location": "[variables('serverLocation')]",
           "name": "AllowAllWindowsAzureIps",
