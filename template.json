@@ -127,7 +127,8 @@
           ],
           "properties": {
             "RepoUrl": "https://github.com/jeremylindsayni/BasicMVCApplication.git",
-            "branch": "master"
+            "branch": "master",
+            "IsManualIntegration": true
           }
         }
       ]
